@@ -20,6 +20,8 @@
 	<languages>
 		<language tag="en-GB">language/en-GB/en-GB.plg_content_strava.ini</language>
 		<language tag="en-GB">language/en-GB/en-GB.plg_content_strava.sys.ini</language>
+		<language tag="fr-FR">language/fr-FR/fr-FR.plg_content_strava.ini</language>
+		<language tag="fr-FR">language/fr-FR/fr-FR.plg_content_strava.sys.ini</language>
 	</languages>
 	<config> 
         <fields name="params"> 
