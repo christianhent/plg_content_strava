@@ -2,7 +2,6 @@
 defined('JPATH_BASE') or die;
 
 use Joomla\Utilities\ArrayHelper;
-use Joomla\String\String;
 
 jimport('joomla.plugin.plugin');
 
