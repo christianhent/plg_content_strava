@@ -3,27 +3,23 @@
  * @package     Joomla.Site
  * @subpackage  Layout
  *
- * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2017 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-defined('_JEXEC') or die;
+defined('JPATH_BASE') or die;
 
+// multipart/form-data
 $doc = JFactory::getDocument();
-
 $doc->addScriptDeclaration( '
 	jQuery(document).ready(function(){
 		jQuery( "form#item-form" ).attr( "enctype", "multipart/form-data" ).attr( "encoding", "multipart/form-data" );
 	});
 ');
 
-$app = JFactory::getApplication();
-$form = $displayData->getForm();
-
-$fieldSets = $form->getFieldsets('params');
-
-// For BC with versions < 3.2 we need to render the attribs too
-$attribsFieldSet = $form->getFieldsets('attribs');
+$app       = JFactory::getApplication();
+$form      = $displayData->getForm();
+$fieldSets = $form->getFieldsets();
 
 $trackFieldSet = $form->getFieldsets('track');
 
@@ -32,7 +28,7 @@ if(!JFactory::getApplication()->getUserState("strava_token"))
 	unset($trackFieldSet['strava']);
 }
 
-$fieldSets = array_merge($fieldSets, $attribsFieldSet, $trackFieldSet);
+$fieldSets = array_merge($fieldSets, $trackFieldSet);
 
 if (empty($fieldSets))
 {
@@ -40,8 +36,9 @@ if (empty($fieldSets))
 }
 
 $ignoreFieldsets = $displayData->get('ignore_fieldsets') ?: array();
-$ignoreFields = $displayData->get('ignore_fields') ?: array();
-$extraFields = $displayData->get('extra_fields') ?: array();
+$ignoreFields    = $displayData->get('ignore_fields') ?: array();
+$extraFields     = $displayData->get('extra_fields') ?: array();
+$tabName         = $displayData->get('tab_name') ?: 'myTab';
 
 if (!empty($displayData->hiddenFieldsets))
 {
@@ -60,28 +57,30 @@ if ($displayData->get('show_options', 1))
 	foreach ($fieldSets as $name => $fieldSet)
 	{
 		// Ensure any fieldsets we don't want to show are skipped (including repeating formfield fieldsets)
-		if (in_array($name, $ignoreFieldsets) || (!empty($configFieldsets) && in_array($name, $configFieldsets))
-				|| !empty($hiddenFieldsets) && in_array($name, $hiddenFieldsets)
-				|| (isset($fieldSet->repeat) && $fieldSet->repeat == true))
+		if ((isset($fieldSet->repeat) && $fieldSet->repeat == true)
+			|| in_array($name, $ignoreFieldsets)
+			|| (!empty($configFieldsets) && in_array($name, $configFieldsets))
+			|| (!empty($hiddenFieldsets) && in_array($name, $hiddenFieldsets))
+		)
 		{
 			continue;
 		}
 
 		if (!empty($fieldSet->label))
 		{
-			$label = JText::_($fieldSet->label, true);
+			$label = JText::_($fieldSet->label);
 		}
 		else
 		{
 			$label = strtoupper('JGLOBAL_FIELDSET_' . $name);
-			if (JText::_($label, true) == $label)
+			if (JText::_($label) === $label)
 			{
 				$label = strtoupper($app->input->get('option') . '_' . $name . '_FIELDSET_LABEL');
 			}
-			$label = JText::_($label, true);
+			$label = JText::_($label);
 		}
 
-		echo JHtml::_('bootstrap.addTab', 'myTab', 'attrib-' . $name, $label);
+		echo JHtml::_('bootstrap.addTab', $tabName, 'attrib-' . $name, $label);
 
 		if (isset($fieldSet->description) && trim($fieldSet->description))
 		{
@@ -96,7 +95,7 @@ if ($displayData->get('show_options', 1))
 }
 else
 {
-	$html = array();
+	$html   = array();
 	$html[] = '<div style="display:none;">';
 	foreach ($fieldSets as $name => $fieldSet)
 	{
@@ -109,7 +108,7 @@ else
 		{
 			foreach ($form->getFieldset($name) as $field)
 			{
-				echo $field->input;
+				$html[] = $field->input;
 			}
 		}
 	}
