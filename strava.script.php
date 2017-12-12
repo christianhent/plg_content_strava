@@ -24,8 +24,6 @@ class plgContentStravaInstallerScript
         return true;
     }
 
-
-
     public function install($parent)
     {
         jimport('joomla.filesystem.folder');

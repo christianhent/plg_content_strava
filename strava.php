@@ -75,18 +75,23 @@ class PlgContentStrava extends JPlugin
 
 		if(!$this->app->getUserState("strava_token"))
 		{
-				JToolBarHelper::divider();
-				JToolBarHelper::custom(
-					'strava.auth',
-					'power-cord.png',
-					'power-cord_f2.png',
-					'PLG_CONTENT_STRAVA_COM_CONTENT_TOOLBAR_STRAVAAUTH_BTN', 
-					false
-				);
+			JToolBarHelper::divider();
+			JToolBarHelper::custom(
+				'strava.auth',
+				'power-cord.png',
+				'power-cord_f2.png',
+				'PLG_CONTENT_STRAVA_COM_CONTENT_TOOLBAR_STRAVAAUTH_BTN', 
+				false
+			);
+		}
+		else {
+
+			JForm::addFormPath(__DIR__ . '/forms');
+			$form->loadFile('strava');
 		}
 
-		JForm::addFormPath(__DIR__ . '/forms');
-		$form->loadFile('strava');
+		#JForm::addFormPath(__DIR__ . '/forms');
+		#$form->loadFile('strava');
 
 		if (!empty($data->id))
 		{
@@ -102,12 +107,14 @@ class PlgContentStrava extends JPlugin
 			
 		if($this->input->get('code'))
 		{
-				$token = $this->_exchangeToken();
+			$token = $this->_exchangeToken();
 
-				$this->app->setUserState("strava_token", $token);
+			$this->app->setUserState("strava_token", $token);
 
-				$uri = JURI::current() . '?option=com_content&view=article&layout=edit&id='.$data->get('id');
-				$this->app->redirect($uri, true );
+			//$uri = JURI::current() . '?option=com_content&view=article&layout=edit&id='.$data->get('id');
+			$uri = JURI::current() . '?option=com_content&view=article&layout=edit&id='.(int)$data->id;
+			
+			$this->app->redirect($uri, true );
 		}
 
 		if($this->app->getUserState("strava_token"))
@@ -194,6 +201,11 @@ class PlgContentStrava extends JPlugin
 					$stravaFormData->distance  = $activity['distance'] /  1000;
 					$stravaFormData->starttime = $activity['start_date'];
 					$stravaFormData->avs       = $activity['average_speed'] / 1000 * 60 * 60;
+					#new
+					$stravaFormData->min_elevation  = $activity['elev_low'];
+					$stravaFormData->max_elevation  = $activity['elev_high'];
+					$stravaFormData->elevation_gain = $activity['total_elevation_gain'];
+					$stravaFormData->elevation_loss = $activity['elevation_loss'];
 					
 					$this->app->enqueueMessage(JText::_('PLG_CONTENT_STRAVA_ACTIVITY_IMPORT_SUCCESS_MESSAGE'), 'message');	
 				}
@@ -363,6 +375,11 @@ class PlgContentStrava extends JPlugin
 		$data->duration           = $stravaFormData->duration;
 		$data->distance           = $stravaFormData->distance;
 		$data->avs                = $stravaFormData->avs;
+		#new
+		$data->min_elevation      = $stravaFormData->min_elevation;
+		$data->max_elevation      = $stravaFormData->max_elevation;
+		$data->elevation_gain     = $stravaFormData->elevation_gain;
+		$data->elevation_loss     = $stravaFormData->elevation_loss;
 
 		if ($exists)
 		{
