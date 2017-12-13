@@ -1,4 +1,17 @@
 <?php
+/**
+ * 
+ * @category   GPX Extension Add-on
+ * @package    Joomla.Plugin
+ * @subpackage Content.Zatracks.Strava
+ * @author     Christian Hent <hent.dev@googlemail.com>
+ * @copyright  Copyright (C) 2017 Christian Hent
+ * @license    GNU General Public License version 2 or later; see LICENSE.txt
+ * @link       https://github.com/christianhent/plg_content_zatracks
+ * 
+ * @version    2.2.0
+ * 
+ */
 defined('JPATH_BASE') or die;
 
 use Joomla\Utilities\ArrayHelper;
@@ -7,7 +20,7 @@ jimport('joomla.plugin.plugin');
 
 class PlgContentStrava extends JPlugin
 {
-    public function __construct(&$subject, $config, JRegistry $options = null, JHttp $http = null, JInput $input = null)
+	public function __construct(&$subject, $config, JRegistry $options = null, JHttp $http = null, JInput $input = null)
 	{
 		parent::__construct($subject, $config);
 
@@ -41,10 +54,10 @@ class PlgContentStrava extends JPlugin
 		}
 
 		$zatracks           = JPluginHelper::getPlugin('content','zatracks');
-        $zatracks_params    = new JRegistry();
-        
-        $zatracks_params->loadString($zatracks->params);
-		
+		$zatracks_params    = new JRegistry();
+
+		$zatracks_params->loadString($zatracks->params);
+
 		$include_categories = $zatracks_params->get('include_categories');
 
 		if (empty($include_categories))
@@ -82,7 +95,7 @@ class PlgContentStrava extends JPlugin
 				'power-cord_f2.png',
 				'PLG_CONTENT_STRAVA_COM_CONTENT_TOOLBAR_STRAVAAUTH_BTN', 
 				false
-			);
+				);
 		}
 		else {
 
@@ -95,16 +108,16 @@ class PlgContentStrava extends JPlugin
 
 		if (!empty($data->id))
 		{
-			
+
 			if (!isset($data->track))
 			{
 				$data->track = new stdClass();
 			}
 
 			$data->track->strava_activity_id  = $this->_getStoredActivityId($data->id);
-			
+
 		}
-			
+
 		if($this->input->get('code'))
 		{
 			$token = $this->_exchangeToken();
@@ -113,7 +126,7 @@ class PlgContentStrava extends JPlugin
 
 			//$uri = JURI::current() . '?option=com_content&view=article&layout=edit&id='.$data->get('id');
 			$uri = JURI::current() . '?option=com_content&view=article&layout=edit&id='.(int)$data->id;
-			
+
 			$this->app->redirect($uri, true );
 		}
 
@@ -126,8 +139,8 @@ class PlgContentStrava extends JPlugin
 				$filtered_activities[] = array_intersect_key( $activity, array_flip( $whitelist ) );
 			}
 
-      		$form->setValue('strava_athlete_activities', 'track', $filtered_activities);
-      	}
+			$form->setValue('strava_athlete_activities', 'track', $filtered_activities);
+		}
 
 		JLayoutHelper::$defaultBasePath = __DIR__ . '/layouts';
 
@@ -148,10 +161,10 @@ class PlgContentStrava extends JPlugin
 
 
 		$zatracks = JPluginHelper::getPlugin('content','zatracks');
-        $zatracks_params = new JRegistry();
-		
+		$zatracks_params = new JRegistry();
+
 		$zatracks_params->loadString($zatracks->params);
-		
+
 		$include_categories = $zatracks_params->get('include_categories');
 
 		if (empty($include_categories))
@@ -174,23 +187,23 @@ class PlgContentStrava extends JPlugin
 
 		if (is_object($formData->track))
 		{
-            $stravaFormData = new stdClass();
+			$stravaFormData = new stdClass();
 			$stravaFormData->strava_activity_id = $formData->track->strava_activity_id;
 		}
 		else
 		{
 
-            return true;
+			return true;
 		}
 
 		$content_id = $data->id;
-		
+
 		if ($this->app->getUserState("strava_token") )
 		{
 			if ($formData->track->strava_activity_id != 0 && $formData->track->strava_activity_id != $this->_getStoredActivityId($data->id))
 			{
 				$activity = $this->_getActivityFromApi($this->app->getUserState("strava_token"), $formData->track->strava_activity_id);
-					
+
 				if(isset($activity))
 				{
 					$stravaFormData->name      = $activity['name'];
@@ -206,7 +219,7 @@ class PlgContentStrava extends JPlugin
 					$stravaFormData->max_elevation  = $activity['elev_high'];
 					$stravaFormData->elevation_gain = $activity['total_elevation_gain'];
 					$stravaFormData->elevation_loss = $activity['elevation_loss'];
-					
+
 					$this->app->enqueueMessage(JText::_('PLG_CONTENT_STRAVA_ACTIVITY_IMPORT_SUCCESS_MESSAGE'), 'message');	
 				}
 			}	
@@ -217,19 +230,19 @@ class PlgContentStrava extends JPlugin
 		return true;
 	}
 
-    public function onAfterDispatch()
-    {
-        
-        JLayoutHelper::$defaultBasePath = "";
-    }
+	public function onAfterDispatch()
+	{
+
+		JLayoutHelper::$defaultBasePath = "";
+	}
 
 	protected function _getStoredActivityId($article_id)
 	{
 		$db    = JFactory::getDBO();
 		$query = $db->getQuery(true)
-			->select('strava_activity_id')
-			->from('#__zatracks')
-			->where('content_id=' . (int)$article_id);
+		->select('strava_activity_id')
+		->from('#__zatracks')
+		->where('content_id=' . (int)$article_id);
 		$db->setQuery($query);
 
 		try
@@ -249,21 +262,21 @@ class PlgContentStrava extends JPlugin
 	protected function _exchangeToken()
 	{
 		// get strava plugin params
-        $plg = JPluginHelper::getPlugin('content','strava');
-        $plgParams = new JRegistry();
-        
-        $plgParams->loadString($plg->params);
+		$plg = JPluginHelper::getPlugin('content','strava');
+		$plgParams = new JRegistry();
+
+		$plgParams->loadString($plg->params);
 
 		// set token exchange options
 		$this->options->set('token_url', 'https://www.strava.com/oauth/token');
-        $this->options->set('client_id', $plgParams->get('client_id'));
-        $this->options->set('client_secret', $plgParams->get('client_secret'));
-        $this->options->set('code', $this->input->get('code'));
+		$this->options->set('client_id', $plgParams->get('client_id'));
+		$this->options->set('client_secret', $plgParams->get('client_secret'));
+		$this->options->set('code', $this->input->get('code'));
 
-        try 
+		try 
 		{
 			$response = $this->http->post($this->options->get('token_url'), $this->options->toArray());
-					
+
 			if ($response->code === 200)
 			{
 				$result = json_decode($response->body);
@@ -275,11 +288,12 @@ class PlgContentStrava extends JPlugin
 			else
 			{
 				$result = json_decode($response->body, true);
-						
+
 				$this->app->enqueueMessage(JText::_('PLG_CONTENT_STRAVA_API_ERROR'.$result['message']), 'error');
 			}	
-					
-		} catch (Exception $e) 
+
+		}
+		catch (Exception $e) 
 		{
 			$this->setError($e);
 		}
@@ -289,13 +303,13 @@ class PlgContentStrava extends JPlugin
 	{
 		$options = new JRegistry;
 
-    	$http = new JHttp($options);
+		$http = new JHttp($options);
 
-    	$url = 'https://www.strava.com/api/v3/activities/'.$id;
-    	
-    	$headers = array('Authorization' => 'Bearer '. $access_token);
+		$url = 'https://www.strava.com/api/v3/activities/'.$id;
 
-    	try
+		$headers = array('Authorization' => 'Bearer '. $access_token);
+
+		try
 		{
 			$response = $http->get($url, $headers);
 
@@ -308,7 +322,7 @@ class PlgContentStrava extends JPlugin
 			else
 			{
 				$result = json_decode($response->body, true);
-						
+
 				$this->app->enqueueMessage(JText::_('PLG_CONTENT_STRAVA_API_ERROR').$result['message'], 'error');
 			}	
 		}
@@ -322,15 +336,15 @@ class PlgContentStrava extends JPlugin
 	{
 		$options = new JRegistry;
 
-    	$http = new JHttp($options);
+		$http = new JHttp($options);
 
-    	$query = array('per_page' => 10);
+		$query = array('per_page' => 10);
 
-    	$url = 'https://www.strava.com/api/v3/athlete/activities?per_page=' . $query['per_page'];
-    	
-    	$headers = array('Authorization' => 'Bearer '. $access_token);
+		$url = 'https://www.strava.com/api/v3/athlete/activities?per_page=' . $query['per_page'];
 
-    	try
+		$headers = array('Authorization' => 'Bearer '. $access_token);
+
+		try
 		{
 			$response = $http->get($url, $headers);
 
@@ -343,7 +357,7 @@ class PlgContentStrava extends JPlugin
 			else
 			{
 				$result = json_decode($response->body, true);
-						
+
 				$this->app->enqueueMessage(JText::_('PLG_CONTENT_STRAVA_API_ERROR').$result['message'], 'error');
 			}	
 		}
@@ -358,8 +372,8 @@ class PlgContentStrava extends JPlugin
 		$db     = JFactory::getDbo();
 		$query  = $db->getQuery(true);
 		$query->select($db->quoteName('content_id'))
-			->from($db->quoteName('#__zatracks'))
-			->where($db->quoteName('content_id') . ' = ' . $content_id);
+		->from($db->quoteName('#__zatracks'))
+		->where($db->quoteName('content_id') . ' = ' . $content_id);
 		$db->setQuery($query);
 		$db->execute();
 		$exists = (bool) $db->getNumRows();

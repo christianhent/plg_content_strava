@@ -1,11 +1,22 @@
 <?php
-
+/**
+ * 
+ * @category   GPX Extension Add-on
+ * @package    Joomla.Plugin
+ * @subpackage Content.Zatracks.Strava
+ * @author     Christian Hent <hent.dev@googlemail.com>
+ * @copyright  Copyright (C) 2017 Christian Hent
+ * @license    GNU General Public License version 2 or later; see LICENSE.txt
+ * @link       https://github.com/christianhent/plg_content_zatracks
+ * 
+ * @version    2.2.0
+ * 
+ */
 defined('_JEXEC') or die;
 
 class plgContentStravaInstallerScript
 {
-    
-	public function preflight($type)
+    public function preflight($type)
     {
         if ($type != "discover_install" && $type != "install")
         {
@@ -51,6 +62,6 @@ class plgContentStravaInstallerScript
         if (JFile::exists($file))
         {
             JFile::delete($file);
-        }       
+        }
     }
 }

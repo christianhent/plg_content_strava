@@ -1,14 +1,18 @@
 <?php
 /**
- * @package     Joomla.Site
- * @subpackage  Layout
- *
- * @copyright   Copyright (C) 2005 - 2017 Open Source Matters, Inc. All rights reserved.
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * 
+ * @category   GPX Extension Add-on
+ * @package    Joomla.Plugin
+ * @subpackage Content.Zatracks.Strava
+ * @author     Christian Hent <hent.dev@googlemail.com>
+ * @copyright  Copyright (C) 2017 Christian Hent
+ * @license    GNU General Public License version 2 or later; see LICENSE.txt
+ * @link       https://github.com/christianhent/plg_content_zatracks
+ * 
+ * @version    2.2.0
+ * 
  */
-
 defined('JPATH_BASE') or die;
-
 // multipart/form-data
 $doc = JFactory::getDocument();
 $doc->addScriptDeclaration( '
